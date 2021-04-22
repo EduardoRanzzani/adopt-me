@@ -1,14 +1,15 @@
-import { StrictMode, useState } from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import Details from './Details';
 import SearchParams from './SearchParams';
-import ThemeContext from './ThemeContext';
+import store from './store';
 
 const App = () => {
-  const theme = useState("peru");
+
   return (
-    <ThemeContext.Provider value={theme}>
+    <Provider store={store} >
       <div>
         <Router>
           <header>
@@ -26,7 +27,7 @@ const App = () => {
           </Switch>
         </Router>
       </div>
-    </ThemeContext.Provider>
+    </Provider>
   );
 };
 

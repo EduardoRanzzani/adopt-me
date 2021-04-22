@@ -1,43 +1,57 @@
-import { FunctionComponent, useContext, useEffect, useState } from 'react';
-import { Animal, Pet, PetAPIResponse } from './APIResponseTypes';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import changeAnimal from './actionCreators/changeAnimal';
+import changeBreed from './actionCreators/changeBreed';
+import changeLocation from './actionCreators/changeLocation';
+import changeTheme from './actionCreators/changeTheme';
 import Results from './Results';
-import ThemeContext from './ThemeContext';
 import useBreedList from './useBreedList';
 
-const ANIMALS: Animal[] = ["bird", "cat", "dog", "rabbit", "reptile"];
 
-const SearchParams: FunctionComponent = () => {
-  const [animal, setAnimal] = useState("" as Animal);
-  const [location, setLocation] = useState("");
-  const [breed, setBreed] = useState("");
-  const [pets, setPets] = useState([] as Pet[]);
+
+
+const ANIMALS = ["bird", "cat", "dog", "rabbit", "reptile"];
+
+const SearchParams = () => {
+  const animal = useSelector(state => state.animal);
+  const breed = useSelector(state => state.breed);
+  const location = useSelector(state => state.location);
+  const theme = useSelector(state => state.theme);
+
+  const [pets, setPets] = useState([]);
   const [breeds] = useBreedList(animal);
-  const [theme, setTheme] = useContext(ThemeContext);
+
+  const dispatch = useDispatch();
+
 
   useEffect(() => {
-    void requestPets();
+    requestPets();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function requestPets() {
     const res = await fetch(
       `http://pets-v2.dev-apis.com/pets?animal=${animal}&location=${location}&breed=${breed}`
     );
-    const json = (await res.json()) as PetAPIResponse;
+    const json = await res.json();
     setPets(json.pets);
+  }
+
+  function handleAnimalChange(e) {
+    dispatch(changeBreed(""));
+    dispatch(changeAnimal(e.target.value));
   }
 
   return (
     <div className="search-params">
       <form onSubmit={(e) => {
         e.preventDefault();
-        void requestPets();
+        requestPets();
       }} >
         <label htmlFor="location">
           Location:
           <input id="location"
             value={location}
-            onChange={e => setLocation(e.target.value)}
-            onBlur={e => setLocation(e.target.value)}
+            onChange={e => dispatch(changeLocation(e.target.value))}
             placeholder="Location"
           />
         </label>
@@ -46,8 +60,8 @@ const SearchParams: FunctionComponent = () => {
           Animal:
           <select id="animal"
             value={animal}
-            onChange={e => setAnimal(e.target.value as Animal)}
-            onBlur={e => setAnimal(e.target.value as Animal )}
+            onChange={handleAnimalChange}
+            onBlur={handleAnimalChange}
           >
             <option value="">---</option>
             {ANIMALS.map(animal => (
@@ -62,8 +76,8 @@ const SearchParams: FunctionComponent = () => {
           Breed:
           <select id="breed"
             value={breed}
-            onChange={(e) => setBreed(e.target.value)}
-            onBlur={(e) => setBreed(e.target.value)}
+            onChange={(e) => dispatch(changeBreed(e.target.value))}
+            onBlur={(e) => dispatch(changeBreed(e.target.value))}
           >
             <option value="">---</option>
             {breeds.map(breed => (
@@ -78,8 +92,8 @@ const SearchParams: FunctionComponent = () => {
           Theme:
           <select
             value={theme}
-            onChange={(e) => setTheme(e.target.value)}
-            onBlur={(e) => setTheme(e.target.value)}
+            onChange={(e) => dispatch(changeTheme(e.target.value))}
+            onBlur={(e) => dispatch(changeTheme(e.target.value))}
           >
             <option value="peru">Peru</option>
             <option value="darkblue">Dark Blue</option>

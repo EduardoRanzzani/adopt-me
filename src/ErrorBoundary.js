@@ -1,24 +1,24 @@
-import { Component, ErrorInfo, ReactNode } from "react";
+import { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
 
 class ErrorBoundary extends Component {
   state = { hasError: false, redirect: false };
 
-  static getDerivedStateFromError(): {hasError: boolean, redirect: boolean} {
-    return { hasError: true, redirect: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
   }
 
-  componentDidCatch(error: Error, info: ErrorInfo): void  {
+  componentDidCatch(error, info) {
     console.error("ErrorBoundary caught an error", error, info);
   }
 
-  componentDidUpdate(): void {
+  componentDidUpdate() {
     if (this.state.hasError) {
       setTimeout(() => this.setState({ redirect: true }), 5000);
     }
   }
 
-  render(): ReactNode {
+  render() {
     if (this.state.redirect) {
       return <Redirect to="/" />;
     } else if (this.state.hasError) {
@@ -29,6 +29,7 @@ class ErrorBoundary extends Component {
         </h2>
       );
     }
+
     return this.props.children;
   }
 }
